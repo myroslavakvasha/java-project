@@ -1,0 +1,14 @@
+# Maven build output
+target/
+
+# NetBeans specific files
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# OS generated files
+.DS_Store
+Thumbs.db
