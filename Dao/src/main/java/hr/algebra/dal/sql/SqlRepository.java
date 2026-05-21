@@ -53,16 +53,19 @@ public class SqlRepository implements Repository {
     private static final String UPDATE_CATEGORY = "{ CALL updateCategory (?,?) }";
     private static final String DELETE_CATEGORY = "{ CALL deleteCategory (?) }";
     private static final String SELECT_CATEGORIES = "{ CALL selectCategories }";
+    private static final String SELECT_CATEGORY = "{ CALL selectCategory (?) }";
 
     private static final String CREATE_MISSION = "{ CALL createMission (?,?) }";
     private static final String UPDATE_MISSION = "{ CALL updateMission (?,?,?) }";
     private static final String DELETE_MISSION = "{ CALL deleteMission (?) }";
     private static final String SELECT_MISSIONS = "{ CALL selectMissions }";
+    private static final String SELECT_MISSION = "{ CALL selectMission (?) }";
 
     private static final String CREATE_PHOTOGRAPHER = "{ CALL createPhotographer (?,?) }";
     private static final String UPDATE_PHOTOGRAPHER = "{ CALL updatePhotographer (?,?,?) }";
     private static final String DELETE_PHOTOGRAPHER = "{ CALL deletePhotographer (?) }";
     private static final String SELECT_PHOTOGRAPHERS = "{ CALL selectPhotographers }";
+    private static final String SELECT_PHOTOGRAPHER = "{ CALL selectPhotographer (?) }";
 
     private static final String ADD_CATEGORY_TO_IMAGE = "{ CALL addCategoryToImage (?,?) }";
     private static final String REMOVE_CATEGORY_FROM_IMAGE = "{ CALL removeCategoryFromImage (?,?) }";
@@ -265,6 +268,20 @@ public class SqlRepository implements Repository {
         }
         return categories;
     }
+    
+    @Override
+    public Optional<Category> selectCategory(int id) throws Exception {
+        DataSource dataSource = DataSourceSingleton.getInstance();
+        try (Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_CATEGORY)) {
+            stmt.setInt(ID, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(new Category(rs.getInt(ID), rs.getString(NAME)));
+                }
+            }
+            return Optional.empty();
+        }
+    }
 
     @Override
     public void createMission(Mission mission) throws Exception {
@@ -311,6 +328,20 @@ public class SqlRepository implements Repository {
         }
         return missions;
     }
+    
+    @Override
+    public Optional<Mission> selectMission(int id) throws Exception {
+        DataSource dataSource = DataSourceSingleton.getInstance();
+        try (Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_MISSION)) {
+            stmt.setInt(ID, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(new Mission(rs.getInt(ID), rs.getString(NAME), rs.getString(DESCRIPTION)));
+                }
+            }
+            return Optional.empty();
+        }
+    }
 
     @Override
     public void createPhotographer(Photographer photographer) throws Exception {
@@ -356,6 +387,20 @@ public class SqlRepository implements Repository {
             }
         }
         return photographers;
+    }
+    
+    @Override
+    public Optional<Photographer> selectPhotographer(int id) throws Exception {
+        DataSource dataSource = DataSourceSingleton.getInstance();
+        try (Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_PHOTOGRAPHER)) {
+            stmt.setInt(ID, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(new Photographer(rs.getInt(ID), rs.getString(NAME), rs.getString(SURNAME)));
+                }
+            }
+            return Optional.empty();
+        }
     }
 
     @Override

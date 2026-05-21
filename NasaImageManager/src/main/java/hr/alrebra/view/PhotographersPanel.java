@@ -4,11 +4,33 @@
  */
 package hr.alrebra.view;
 
+import hr.algebra.dal.Repository;
+import hr.algebra.dal.RepositoryFactory;
+import hr.algebra.model.Photographer;
+import hr.algebra.utilities.MessageUtils;
+import hr.alrebra.view.model.PhotographerTableModel;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
+import javax.swing.text.JTextComponent;
+
 /**
  *
  * @author kvash
  */
 public class PhotographersPanel extends javax.swing.JPanel {
+
+    private List<JTextComponent> validationFields;
+    private List<JLabel> errorLabels;
+
+    private Repository repository;
+    private PhotographerTableModel photographersTableModel;
+
+    private Photographer selectedPhotographer;
 
     /**
      * Creates new form PhotographersPanel
@@ -24,19 +46,344 @@ public class PhotographersPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lbTitle = new javax.swing.JLabel();
+        lbDesc2 = new javax.swing.JLabel();
+        lbDesc1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbPhotographers = new javax.swing.JTable();
+        lbRecords = new javax.swing.JLabel();
+        lbName = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        tfName = new javax.swing.JTextField();
+        lbErrorName = new javax.swing.JLabel();
+        btnDelete = new javax.swing.JButton();
+        btnAdd = new javax.swing.JButton();
+        btnUpdate = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+        lbMissionDesc = new javax.swing.JLabel();
+        lbErrorSurname = new javax.swing.JLabel();
+        tfSurname = new javax.swing.JTextField();
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
+
+        lbTitle.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lbTitle.setText("Photographers");
+
+        lbDesc2.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        lbDesc2.setText("Be careful, the altering actions are irreversible!");
+
+        lbDesc1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbDesc1.setText("You can see all the photographers, edit them, or delete them.");
+
+        tbPhotographers.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tbPhotographers.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tbPhotographers.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbPhotographersMouseClicked(evt);
+            }
+        });
+        tbPhotographers.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tbPhotographersKeyReleased(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tbPhotographers);
+
+        lbRecords.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lbRecords.setText("Availible records:");
+
+        lbName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbName.setText("Photographer name:");
+
+        tfName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        lbErrorName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorName.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorName.setText("X");
+
+        btnDelete.setBackground(new java.awt.Color(255, 51, 51));
+        btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(this::btnDeleteActionPerformed);
+
+        btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnAdd.setText("Add");
+        btnAdd.addActionListener(this::btnAddActionPerformed);
+
+        btnUpdate.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnUpdate.setText("Update");
+        btnUpdate.addActionListener(this::btnUpdateActionPerformed);
+
+        lbMissionDesc.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbMissionDesc.setText("Photographer Surname:");
+
+        lbErrorSurname.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorSurname.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorSurname.setText("X");
+
+        tfSurname.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(406, 406, 406)
+                .addComponent(tfSurname, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lbErrorSurname, javax.swing.GroupLayout.PREFERRED_SIZE, 9, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(573, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(45, 45, 45)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(lbErrorName))
+                                .addComponent(lbName))
+                            .addGap(55, 55, 55)
+                            .addComponent(lbMissionDesc)
+                            .addContainerGap(726, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lbDesc1, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lbDesc2, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lbRecords)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(0, 659, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jScrollPane1)
+                                .addComponent(jSeparator1)
+                                .addComponent(jSeparator2))
+                            .addGap(45, 45, 45)))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(245, 245, 245)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfSurname, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbErrorSurname))
+                .addContainerGap(505, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(42, 42, 42)
+                    .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(18, 18, 18)
+                    .addComponent(lbDesc1)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lbDesc2)
+                    .addGap(26, 26, 26)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(18, 18, 18)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lbName)
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lbErrorName))
+                            .addGap(39, 39, 39)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(27, 27, 27)
+                            .addComponent(lbRecords)
+                            .addGap(30, 30, 30)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lbMissionDesc)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 509, Short.MAX_VALUE)))
+                    .addGap(43, 43, 43)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void tbPhotographersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbPhotographersMouseClicked
+        showPhotographer();
+    }//GEN-LAST:event_tbPhotographersMouseClicked
+
+    private void tbPhotographersKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbPhotographersKeyReleased
+        showPhotographer();
+    }//GEN-LAST:event_tbPhotographersKeyReleased
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        if (selectedPhotographer == null) {
+            MessageUtils.showInformationMessage("Wrong operation", "Please choose a photographer to delete");
+            return;
+        }
+        if (MessageUtils.showConfirmDialog(
+                "Delete photographer",
+                "Do you really want to delete photographer?")) {
+            try {
+                repository.deletePhotographer(selectedPhotographer.getId());
+                photographersTableModel.setPhotographers(repository.selectPhotographers());
+                clearForm();
+            } catch (Exception ex) {
+                Logger.getLogger(PhotographersPanel.class.getName()).log(Level.SEVERE, null, ex);
+                MessageUtils.showErrorMessage("Error", "Unable to delete photographer!");
+            }
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        if (!formValid()) {
+            return;
+        }
+        try {
+            Photographer photographer = new Photographer(tfName.getText().trim(), tfSurname.getText().trim());
+            repository.createPhotographer(photographer);
+            photographersTableModel.setPhotographers(repository.selectPhotographers());
+            clearForm();
+        } catch (Exception ex) {
+            Logger.getLogger(PhotographersPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to create photographer!");
+        }
+    }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        if (selectedPhotographer == null) {
+            MessageUtils.showInformationMessage("Wrong operation", "Please choose a photographer to update");
+            return;
+        }
+        if (!formValid()) {
+            return;
+        }
+        try {
+            selectedPhotographer.setName(tfName.getText().trim());
+            selectedPhotographer.setSurname(tfSurname.getText().trim());
+            repository.updatePhotographer(selectedPhotographer.getId(), selectedPhotographer);
+            photographersTableModel.setPhotographers(repository.selectPhotographers());
+            clearForm();
+        } catch (Exception ex) {
+            Logger.getLogger(PhotographersPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to update photographer!");
+        }
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        init();
+    }//GEN-LAST:event_formComponentShown
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnUpdate;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JLabel lbDesc1;
+    private javax.swing.JLabel lbDesc2;
+    private javax.swing.JLabel lbErrorName;
+    private javax.swing.JLabel lbErrorSurname;
+    private javax.swing.JLabel lbMissionDesc;
+    private javax.swing.JLabel lbName;
+    private javax.swing.JLabel lbRecords;
+    private javax.swing.JLabel lbTitle;
+    private javax.swing.JTable tbPhotographers;
+    private javax.swing.JTextField tfName;
+    private javax.swing.JTextField tfSurname;
     // End of variables declaration//GEN-END:variables
+
+    private void showPhotographer() {
+        clearForm();
+        int selectedRow = tbPhotographers.getSelectedRow();
+        int rowIndex = tbPhotographers.convertRowIndexToModel(selectedRow);
+        int selectedPhotographerId = (int) photographersTableModel.getValueAt(rowIndex, 0);
+
+        try {
+            Optional<Photographer> optPhotographer = repository.selectPhotographer(selectedPhotographerId);
+            if (optPhotographer.isPresent()) {
+                selectedPhotographer = optPhotographer.get();
+                fillForm(selectedPhotographer);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(PhotographersPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to show photographer!");
+        }
+    }
+
+    private void clearForm() {
+        hideErrors();
+        validationFields.forEach(e -> e.setText(""));
+        selectedPhotographer = null;
+    }
+
+    private boolean formValid() {
+        hideErrors();
+        boolean ok = true;
+
+        for (int i = 0; i < validationFields.size(); i++) {
+            ok &= !validationFields.get(i).getText().trim().isEmpty();
+            errorLabels.get(i).setVisible(validationFields.get(i).getText().trim().isEmpty());
+        }
+        return ok;
+    }
+
+    private void hideErrors() {
+        errorLabels.forEach(e -> e.setVisible(false));
+    }
+
+    private void init() {
+        try {
+            initValidation();
+            hideErrors();
+            initRepository();
+            initTable();
+        } catch (Exception ex) {
+            Logger.getLogger(PhotographersPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Unrecoverable error", "Cannot initiate the form");
+            System.exit(1);
+        }
+    }
+
+    private void initValidation() {
+        validationFields = Arrays.asList(tfName, tfSurname);
+        errorLabels = Arrays.asList(lbErrorName, lbErrorSurname);
+    }
+
+    private void initRepository() throws Exception {
+        repository = RepositoryFactory.getRepository();
+    }
+
+    private void initTable() throws Exception {
+        tbPhotographers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tbPhotographers.setAutoCreateRowSorter(true);
+        tbPhotographers.setRowHeight(25);
+        photographersTableModel = new PhotographerTableModel(repository.selectPhotographers());
+        tbPhotographers.setModel(photographersTableModel);
+    }
+
+    private void fillForm(Photographer photographer) {
+        tfName.setText(photographer.getName());
+        tfSurname.setText(photographer.getSurname());
+    }
 }

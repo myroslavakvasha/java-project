@@ -4,11 +4,32 @@
  */
 package hr.alrebra.view;
 
+import hr.algebra.dal.Repository;
+import hr.algebra.dal.RepositoryFactory;
+import hr.algebra.utilities.MessageUtils;
+import hr.alrebra.view.model.CategoryTableModel;
+import hr.algebra.model.Category;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
+import javax.swing.text.JTextComponent;
+
 /**
  *
  * @author kvash
  */
 public class CategoriesPanel extends javax.swing.JPanel {
+
+    private JTextComponent validationField;
+    private JLabel errorLabel;
+
+    private Repository repository;
+    private CategoryTableModel categoriesTableModel;
+
+    private Category selectedCategory;
 
     /**
      * Creates new form CategoriesPanel
@@ -30,6 +51,20 @@ public class CategoriesPanel extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tbCategories = new javax.swing.JTable();
         lbRecords = new javax.swing.JLabel();
+        lbName = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        tfName = new javax.swing.JTextField();
+        lbErrorName = new javax.swing.JLabel();
+        btnDelete = new javax.swing.JButton();
+        btnAdd = new javax.swing.JButton();
+        btnUpdate = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
 
         lbTitle.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         lbTitle.setText("Categories");
@@ -52,10 +87,43 @@ public class CategoriesPanel extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tbCategories.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbCategoriesMouseClicked(evt);
+            }
+        });
+        tbCategories.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tbCategoriesKeyReleased(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbCategories);
 
-        lbRecords.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lbRecords.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lbRecords.setText("Availible records:");
+
+        lbName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbName.setText("Category name:");
+
+        tfName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        lbErrorName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorName.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorName.setText("X");
+
+        btnDelete.setBackground(new java.awt.Color(255, 51, 51));
+        btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(this::btnDeleteActionPerformed);
+
+        btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnAdd.setText("Add");
+        btnAdd.addActionListener(this::btnAddActionPerformed);
+
+        btnUpdate.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnUpdate.setText("Update");
+        btnUpdate.addActionListener(this::btnUpdateActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -63,13 +131,26 @@ public class CategoriesPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(36, 36, 36)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lbErrorName))
+                    .addComponent(lbName)
                     .addComponent(lbDesc1, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbDesc2, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbRecords)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 513, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(651, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1122, Short.MAX_VALUE)
+                    .addComponent(jSeparator1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSeparator2))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -80,21 +161,183 @@ public class CategoriesPanel extends javax.swing.JPanel {
                 .addComponent(lbDesc1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbDesc2)
-                .addGap(78, 78, 78)
+                .addGap(26, 26, 26)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lbName)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbErrorName))
+                .addGap(39, 39, 39)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
                 .addComponent(lbRecords)
-                .addGap(41, 41, 41)
+                .addGap(30, 30, 30)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(242, Short.MAX_VALUE))
+                .addGap(45, 45, 45))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        if (!formValid()) {
+            return;
+        }
+        try {
+            Category category = new Category(tfName.getText().trim());
+            repository.createCategory(category);
+            categoriesTableModel.setCategories(repository.selectCategories());
+            clearForm();
+        } catch (Exception ex) {
+            Logger.getLogger(CategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to create category!");
+        }
+    }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        if (selectedCategory == null) {
+            MessageUtils.showInformationMessage("Wrong operation", "Please choose category to update");
+            return;
+        }
+        if (!formValid()) {
+            return;
+        }
+        try {
+            selectedCategory.setName(tfName.getText().trim());
+            repository.updateCategory(selectedCategory.getId(), selectedCategory);
+            categoriesTableModel.setCategories(repository.selectCategories());
+            clearForm();
+        } catch (Exception ex) {
+            Logger.getLogger(CategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to update category!");
+        }
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        if (selectedCategory == null) {
+            MessageUtils.showInformationMessage("Wrong operation", "Please choose a category to delete");
+            return;
+        }
+        if (MessageUtils.showConfirmDialog(
+                "Delete category",
+                "Do you really want to delete category?")) {
+            try {
+                repository.deleteCategory(selectedCategory.getId());
+                categoriesTableModel.setCategories(repository.selectCategories());
+                clearForm();
+            } catch (Exception ex) {
+                Logger.getLogger(CategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
+                MessageUtils.showErrorMessage("Error", "Unable to delete category!");
+            }
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void tbCategoriesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCategoriesMouseClicked
+        showCategory();
+    }//GEN-LAST:event_tbCategoriesMouseClicked
+
+    private void tbCategoriesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbCategoriesKeyReleased
+        showCategory();
+    }//GEN-LAST:event_tbCategoriesKeyReleased
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        init();
+    }//GEN-LAST:event_formComponentShown
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnUpdate;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel lbDesc1;
     private javax.swing.JLabel lbDesc2;
+    private javax.swing.JLabel lbErrorName;
+    private javax.swing.JLabel lbName;
     private javax.swing.JLabel lbRecords;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JTable tbCategories;
+    private javax.swing.JTextField tfName;
     // End of variables declaration//GEN-END:variables
+
+    private void clearForm() {
+        hideErrors();
+        validationField.setText("");
+        selectedCategory = null;
+    }
+
+    private boolean formValid() {
+        hideErrors();
+        boolean ok = true;
+
+        ok &= !validationField.getText().trim().isEmpty();
+        errorLabel.setVisible(validationField.getText().trim().isEmpty());
+
+        return ok;
+    }
+
+    private void showCategory() {
+        clearForm();
+        int selectedRow = tbCategories.getSelectedRow();
+        int rowIndex = tbCategories.convertRowIndexToModel(selectedRow);
+        int selectedCategoryId = (int) categoriesTableModel.getValueAt(rowIndex, 0);
+
+        try {
+            Optional<Category> optCategory = repository.selectCategory(selectedCategoryId);
+            if (optCategory.isPresent()) {
+                selectedCategory = optCategory.get();
+                fillForm(selectedCategory);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(CategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to show category!");
+        }
+    }
+
+    private void init() {
+        try {
+            initValidation();
+            hideErrors();
+            initRepository();
+            initTable();
+        } catch (Exception ex) {
+            Logger.getLogger(CategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Unrecoverable error", "Cannot initiate the form");
+            System.exit(1);
+        }
+    }
+
+    private void initValidation() {
+        validationField = tfName;
+        errorLabel = lbErrorName;
+    }
+
+    private void initRepository() throws Exception {
+        repository = RepositoryFactory.getRepository();
+    }
+
+    private void hideErrors() {
+        errorLabel.setVisible(false);
+    }
+
+    private void initTable() throws Exception {
+        tbCategories.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tbCategories.setAutoCreateRowSorter(true);
+        tbCategories.setRowHeight(25);
+        List<Category> cats = repository.selectCategories();
+        System.out.println("Categories loaded: " + cats.size());
+        categoriesTableModel = new CategoryTableModel(cats);
+        tbCategories.setModel(categoriesTableModel);
+    }
+
+    private void fillForm(Category category) {
+        tfName.setText(category.getName());
+    }
 }

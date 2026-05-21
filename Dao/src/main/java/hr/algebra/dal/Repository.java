@@ -29,16 +29,19 @@ public interface Repository {
     void updateCategory(int id, Category data) throws Exception;
     void deleteCategory(int id) throws Exception;
     List<Category> selectCategories() throws Exception;
+    Optional<Category> selectCategory(int id) throws Exception;
     
     void createMission(Mission mission) throws Exception;
     void updateMission(int id, Mission data) throws Exception;
     void deleteMission(int id) throws Exception;
     List<Mission> selectMissions() throws Exception;
+    Optional<Mission> selectMission(int id) throws Exception;
 
     void createPhotographer(Photographer photographer) throws Exception;
     void updatePhotographer(int id, Photographer data) throws Exception;
     void deletePhotographer(int id) throws Exception;
     List<Photographer> selectPhotographers() throws Exception;
+    Optional<Photographer> selectPhotographer(int id) throws Exception;
 
     void addCategoryToImage(int idImage, int idCategory) throws Exception;
     void removeCategoryFromImage(int idImage, int idCategory) throws Exception;
