@@ -75,7 +75,7 @@ public final class Mission implements Comparable<Mission>{
 
     @Override
     public String toString() {
-        return "Mission{" + "id=" + id + ", name=" + name + ", description=" + description + '}';
+        return name;
     }
 
     @Override

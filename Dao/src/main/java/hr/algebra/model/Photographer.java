@@ -75,7 +75,7 @@ public final class Photographer implements Comparable<Photographer>{
 
     @Override
     public String toString() {
-        return "Photographer{" + "id=" + id + ", name=" + name + ", surname=" + surname + '}';
+        return name + " " + surname;
     }
 
     @Override

@@ -4,11 +4,48 @@
  */
 package hr.alrebra.view;
 
+import hr.algebra.dal.Repository;
+import hr.algebra.dal.RepositoryFactory;
+import hr.algebra.model.Mission;
+import hr.algebra.model.NasaImage;
+import hr.algebra.model.Photographer;
+import hr.algebra.utilities.FileUtils;
+import hr.algebra.utilities.IconUtils;
+import hr.algebra.utilities.MessageUtils;
+import hr.alrebra.view.model.NasaImageTableModel;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.text.JTextComponent;
+
 /**
  *
  * @author kvash
  */
 public class NasaImagesPanel extends javax.swing.JPanel {
+
+    private static final String DIR = "assets";
+
+    private List<JTextComponent> validationFields;
+    private List<JLabel> errorLabels;
+
+    private Repository repository;
+    private NasaImageTableModel nasaImagesTableModel;
+
+    private NasaImage selectedNasaImage;
 
     /**
      * Creates new form NasaImagesPanel
@@ -24,25 +61,704 @@ public class NasaImagesPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bgSort = new javax.swing.ButtonGroup();
+        lbPageTitle = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbNasaImages = new javax.swing.JTable();
+        lbRecords = new javax.swing.JLabel();
+        lbTitle = new javax.swing.JLabel();
+        tfTitle = new javax.swing.JTextField();
+        lbErrorTitle = new javax.swing.JLabel();
+        btnDelete = new javax.swing.JButton();
+        btnChooseImage = new javax.swing.JButton();
+        btnUpdate = new javax.swing.JButton();
+        lbIcon = new javax.swing.JLabel();
+        lbLink = new javax.swing.JLabel();
+        tfLink = new javax.swing.JTextField();
+        lbErrorLink = new javax.swing.JLabel();
+        lbDesc = new javax.swing.JLabel();
+        lbErrorDesc = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        taDesc = new javax.swing.JTextArea();
+        lbDate = new javax.swing.JLabel();
+        tfDate = new javax.swing.JTextField();
+        lbErrorDate = new javax.swing.JLabel();
+        cbPhotographer = new javax.swing.JComboBox<>();
+        cbColumnSort = new javax.swing.JComboBox<>();
+        lbErrorMission = new javax.swing.JLabel();
+        lbErrorPhotographer = new javax.swing.JLabel();
+        lbMission = new javax.swing.JLabel();
+        lbMission1 = new javax.swing.JLabel();
+        tfPicturePath = new javax.swing.JTextField();
+        btnAdd = new javax.swing.JButton();
+        lbRecords1 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        cbMission = new javax.swing.JComboBox<>();
+        lbTitleSort = new javax.swing.JLabel();
+        lbColumnSort = new javax.swing.JLabel();
+        spTitleLength = new javax.swing.JSpinner();
+        rbDesc = new javax.swing.JRadioButton();
+        rbAsc = new javax.swing.JRadioButton();
+        lbErrorPicturePath = new javax.swing.JLabel();
+
         setFocusable(false);
         setPreferredSize(new java.awt.Dimension(1200, 747));
         setRequestFocusEnabled(false);
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
+
+        lbPageTitle.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lbPageTitle.setText("Nasa Image of the Day");
+
+        tbNasaImages.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tbNasaImages.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tbNasaImages.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbNasaImagesMouseClicked(evt);
+            }
+        });
+        tbNasaImages.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tbNasaImagesKeyReleased(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tbNasaImages);
+
+        lbRecords.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lbRecords.setText("Sorting options:");
+
+        lbTitle.setText("Title:");
+
+        lbErrorTitle.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorTitle.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorTitle.setText("X");
+
+        btnDelete.setBackground(new java.awt.Color(255, 51, 51));
+        btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(this::btnDeleteActionPerformed);
+
+        btnChooseImage.setText("Choose image");
+        btnChooseImage.addActionListener(this::btnChooseImageActionPerformed);
+
+        btnUpdate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnUpdate.setText("Update");
+        btnUpdate.addActionListener(this::btnUpdateActionPerformed);
+
+        lbIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/no_image.png"))); // NOI18N
+        lbIcon.setText("jLabel1");
+
+        lbLink.setText("Link:");
+
+        lbErrorLink.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorLink.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorLink.setText("X");
+
+        lbDesc.setText("Description:");
+
+        lbErrorDesc.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorDesc.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorDesc.setText("X");
+
+        taDesc.setColumns(20);
+        taDesc.setLineWrap(true);
+        taDesc.setRows(5);
+        jScrollPane2.setViewportView(taDesc);
+
+        lbDate.setText("Published date:");
+
+        lbErrorDate.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorDate.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorDate.setText("X");
+
+        cbColumnSort.addActionListener(this::cbColumnSortActionPerformed);
+
+        lbErrorMission.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorMission.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorMission.setText("X");
+
+        lbErrorPhotographer.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorPhotographer.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorPhotographer.setText("X");
+
+        lbMission.setText("Photographer:");
+
+        lbMission1.setText("Mission:");
+
+        btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnAdd.setText("Add");
+        btnAdd.addActionListener(this::btnAddActionPerformed);
+
+        lbRecords1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lbRecords1.setText("Availible records:");
+
+        lbTitleSort.setText("By title length");
+
+        lbColumnSort.setText("By column");
+
+        spTitleLength.addChangeListener(this::spTitleLengthStateChanged);
+
+        bgSort.add(rbDesc);
+        rbDesc.setText("Descending");
+        rbDesc.addActionListener(this::rbDescActionPerformed);
+
+        bgSort.add(rbAsc);
+        rbAsc.setText("Ascending");
+        rbAsc.addActionListener(this::rbAscActionPerformed);
+
+        lbErrorPicturePath.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbErrorPicturePath.setForeground(new java.awt.Color(255, 51, 51));
+        lbErrorPicturePath.setText("X");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1200, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addComponent(lbErrorPicturePath)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbPageTitle)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                            .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                            .addComponent(tfPicturePath, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(18, 18, 18)
+                                            .addComponent(btnChooseImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(lbIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 499, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnDelete, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(lbRecords1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jSeparator1)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(lbRecords)
+                                        .addGap(37, 37, 37)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(rbAsc)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(rbDesc))
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(cbColumnSort, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(lbColumnSort, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(7, 7, 7)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(lbTitleSort, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(spTitleLength, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lbLink, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(lbDesc, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 608, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addGap(18, 18, 18)
+                                                    .addComponent(lbErrorDesc))
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(tfDate, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                            .addComponent(lbErrorDate))
+                                                        .addComponent(lbDate, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(cbMission, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                            .addComponent(lbErrorMission))
+                                                        .addComponent(lbMission1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGap(18, 18, 18)
+                                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(cbPhotographer, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addGap(18, 18, 18)
+                                                            .addComponent(lbErrorPhotographer))
+                                                        .addComponent(lbMission, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                            .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addGap(0, 0, Short.MAX_VALUE))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                .addComponent(tfLink, javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addComponent(tfTitle))
+                                                            .addGap(18, 18, 18)))
+                                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(lbErrorTitle)
+                                                        .addComponent(lbErrorLink)))))
+                                        .addGap(0, 0, Short.MAX_VALUE)))))
+                        .addGap(31, 31, 31))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 747, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(37, Short.MAX_VALUE)
+                .addComponent(lbPageTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lbTitle)
+                                    .addGap(9, 9, 9)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(tfTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lbErrorTitle))
+                                    .addGap(8, 8, 8)
+                                    .addComponent(lbLink)
+                                    .addGap(9, 9, 9)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(tfLink, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lbErrorLink))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(lbDesc)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lbErrorDesc)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(lbDate)
+                                                .addComponent(lbMission))
+                                            .addGap(9, 9, 9)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(tfDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(lbErrorDate)
+                                                .addComponent(lbErrorMission)
+                                                .addComponent(lbErrorPhotographer)
+                                                .addComponent(cbPhotographer, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(cbMission, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(lbMission1)))
+                                .addComponent(lbIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(lbErrorPicturePath))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(tfPicturePath)
+                            .addComponent(btnChooseImage, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lbRecords)
+                            .addComponent(lbTitleSort)
+                            .addComponent(lbColumnSort))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbColumnSort, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spTitleLength, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(rbAsc)
+                            .addComponent(rbDesc)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lbRecords1)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34))
         );
 
         getAccessibleContext().setAccessibleName("");
     }// </editor-fold>//GEN-END:initComponents
 
+    private void tbNasaImagesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbNasaImagesMouseClicked
+        showNasaImage();
+    }//GEN-LAST:event_tbNasaImagesMouseClicked
+
+    private void tbNasaImagesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbNasaImagesKeyReleased
+        showNasaImage();
+    }//GEN-LAST:event_tbNasaImagesKeyReleased
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        if (selectedNasaImage == null) {
+            MessageUtils.showInformationMessage("Wrong operation", "Please choose an image to delete");
+            return;
+        }
+        if (MessageUtils.showConfirmDialog(
+                "Delete image",
+                "Do you really want to delete the image?")) {
+            try {
+                if (selectedNasaImage.getPicturePath() != null) {
+                    Files.deleteIfExists(Paths.get(selectedNasaImage.getPicturePath()));
+                }
+                repository.deleteNasaImage(selectedNasaImage.getId());
+                loadTable();
+
+                clearForm();
+            } catch (Exception ex) {
+                Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+                MessageUtils.showErrorMessage("Error", "Unable to delete the image!");
+            }
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnChooseImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseImageActionPerformed
+        File file = FileUtils.uploadFile("Images", "jpg", "jpeg", "png");
+        if (file == null) {
+            return;
+        }
+        tfPicturePath.setText(file.getAbsolutePath());
+        setIcon(lbIcon, file);
+    }//GEN-LAST:event_btnChooseImageActionPerformed
+
+    private void setIcon(JLabel label, File file) {
+        try {
+            label.setIcon(IconUtils.createIcon(file, label.getWidth(), label.getHeight()));
+        } catch (IOException ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to set icon!");
+        }
+    }
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        if (selectedNasaImage == null) {
+            MessageUtils.showInformationMessage("Wrong operation", "Please choose an image to update");
+            return;
+        }
+        if (!formValid()) {
+            return;
+        }
+        try {
+            if (!tfPicturePath.getText().trim().equals(selectedNasaImage.getPicturePath())) {
+                if (selectedNasaImage.getPicturePath() != null) {
+                    Files.deleteIfExists(Paths.get(selectedNasaImage.getPicturePath()));
+                }
+                String localPicturePath = uploadPicture();
+                selectedNasaImage.setPicturePath(localPicturePath);
+            }
+
+            Mission selectedMission = (Mission) cbMission.getSelectedItem();
+            Photographer selectedPhotographer = (Photographer) cbPhotographer.getSelectedItem();
+
+            selectedNasaImage.setTitle(tfTitle.getText().trim());
+            selectedNasaImage.setLink(tfLink.getText().trim());
+            selectedNasaImage.setDescription(taDesc.getText().trim());
+            selectedNasaImage.setPublishedDate(LocalDateTime.parse(tfDate.getText().trim(), NasaImage.DATE_FORMATTER));
+            selectedNasaImage.setIdMission(selectedMission != null ? selectedMission.getId() : null);
+            selectedNasaImage.setIdPhotographer(selectedPhotographer != null ? selectedPhotographer.getId() : null);
+
+            repository.updateNasaImage(selectedNasaImage.getId(), selectedNasaImage);
+            loadTable();
+
+            clearForm();
+        } catch (Exception ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to update the image!");
+        }
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        if (!formValid()) {
+            return;
+        }
+        try {
+            String localPicturePath = uploadPicture();
+            Mission selectedMission = (Mission) cbMission.getSelectedItem();
+            Photographer selectedPhotographer = (Photographer) cbPhotographer.getSelectedItem();
+            NasaImage nasaImage = new NasaImage(
+                    tfTitle.getText().trim(),
+                    tfLink.getText().trim(),
+                    taDesc.getText().trim(),
+                    localPicturePath,
+                    LocalDateTime.parse(tfDate.getText().trim(), NasaImage.DATE_FORMATTER),
+                    selectedMission != null ? selectedMission.getId() : null,
+                    selectedPhotographer != null ? selectedPhotographer.getId() : null
+            );
+            repository.createNasaImage(nasaImage);
+            loadTable();
+
+            clearForm();
+        } catch (Exception ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to create an image!");
+        }
+    }//GEN-LAST:event_btnAddActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        init();
+    }//GEN-LAST:event_formComponentShown
+
+    private void cbColumnSortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbColumnSortActionPerformed
+        try {
+            loadTable();
+        } catch (Exception ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to sort images!");
+        }
+    }//GEN-LAST:event_cbColumnSortActionPerformed
+
+    private void rbAscActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbAscActionPerformed
+        try {
+            loadTable();
+        } catch (Exception ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to sort images!");
+        }
+    }//GEN-LAST:event_rbAscActionPerformed
+
+    private void rbDescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbDescActionPerformed
+        try {
+            loadTable();
+        } catch (Exception ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to sort images!");
+        }
+    }//GEN-LAST:event_rbDescActionPerformed
+
+    private void spTitleLengthStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spTitleLengthStateChanged
+        try {
+            loadTable();
+        } catch (Exception ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to sort images!");
+        }
+    }//GEN-LAST:event_spTitleLengthStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgSort;
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnChooseImage;
+    private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnUpdate;
+    private javax.swing.JComboBox<String> cbColumnSort;
+    private javax.swing.JComboBox<Mission> cbMission;
+    private javax.swing.JComboBox<Photographer> cbPhotographer;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lbColumnSort;
+    private javax.swing.JLabel lbDate;
+    private javax.swing.JLabel lbDesc;
+    private javax.swing.JLabel lbErrorDate;
+    private javax.swing.JLabel lbErrorDesc;
+    private javax.swing.JLabel lbErrorLink;
+    private javax.swing.JLabel lbErrorMission;
+    private javax.swing.JLabel lbErrorPhotographer;
+    private javax.swing.JLabel lbErrorPicturePath;
+    private javax.swing.JLabel lbErrorTitle;
+    private javax.swing.JLabel lbIcon;
+    private javax.swing.JLabel lbLink;
+    private javax.swing.JLabel lbMission;
+    private javax.swing.JLabel lbMission1;
+    private javax.swing.JLabel lbPageTitle;
+    private javax.swing.JLabel lbRecords;
+    private javax.swing.JLabel lbRecords1;
+    private javax.swing.JLabel lbTitle;
+    private javax.swing.JLabel lbTitleSort;
+    private javax.swing.JRadioButton rbAsc;
+    private javax.swing.JRadioButton rbDesc;
+    private javax.swing.JSpinner spTitleLength;
+    private javax.swing.JTextArea taDesc;
+    private javax.swing.JTable tbNasaImages;
+    private javax.swing.JTextField tfDate;
+    private javax.swing.JTextField tfLink;
+    private javax.swing.JTextField tfPicturePath;
+    private javax.swing.JTextField tfTitle;
     // End of variables declaration//GEN-END:variables
+
+    private void init() {
+        try {
+            initValidation();
+            hideErrors();
+            initRepository();
+            initTable();
+            initComboBox();
+        } catch (Exception ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Unrecoverable error", "Cannot initiate the form");
+            System.exit(1);
+        }
+    }
+
+    private boolean formValid() {
+        hideErrors();
+        boolean ok = true;
+
+        for (int i = 0; i < validationFields.size(); i++) {
+            ok &= !validationFields.get(i).getText().trim().isEmpty();
+            errorLabels.get(i).setVisible(validationFields.get(i).getText().trim().isEmpty());
+            if ("Date".equals(validationFields.get(i).getName())) {
+                try {
+                    LocalDateTime.parse(validationFields.get(i).getText().trim(), NasaImage.DATE_FORMATTER);
+                } catch (Exception e) {
+                    ok = false;
+                    errorLabels.get(i).setVisible(true);
+                }
+            }
+        }
+        return ok;
+    }
+
+    private String uploadPicture() throws IOException {
+        String picturePath = tfPicturePath.getText();
+        String ext = picturePath.substring(picturePath.lastIndexOf("."));
+        String pictureName = UUID.randomUUID() + ext;
+        String localPicturePath = DIR + File.separator + pictureName;
+
+        FileUtils.copy(picturePath, localPicturePath);
+        return localPicturePath;
+    }
+
+    private void clearForm() {
+        hideErrors();
+        validationFields.forEach(e -> e.setText(""));
+        lbIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/no_image.png")));
+        selectedNasaImage = null;
+        cbMission.setSelectedIndex(0);
+        cbPhotographer.setSelectedIndex(0);
+    }
+
+    private void showNasaImage() {
+        clearForm();
+        int selectedRow = tbNasaImages.getSelectedRow();
+        int rowIndex = tbNasaImages.convertRowIndexToModel(selectedRow);
+        int selectedNasaImageId = (int) nasaImagesTableModel.getValueAt(rowIndex, 0);
+
+        try {
+            Optional<NasaImage> optNasaImage = repository.selectNasaImage(selectedNasaImageId);
+            if (optNasaImage.isPresent()) {
+                selectedNasaImage = optNasaImage.get();
+                fillForm(selectedNasaImage);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(NasaImagesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to show the image!");
+        }
+    }
+
+    private void initValidation() {
+        validationFields = Arrays.asList(tfTitle, tfLink, taDesc, tfDate, tfPicturePath);
+        errorLabels = Arrays.asList(lbErrorTitle, lbErrorLink, lbErrorDesc, lbErrorDate, lbErrorPicturePath);
+    }
+
+    private void hideErrors() {
+        errorLabels.forEach(e -> e.setVisible(false));
+        lbErrorMission.setVisible(false);
+        lbErrorPhotographer.setVisible(false);
+    }
+
+    private void initRepository() throws Exception {
+        repository = RepositoryFactory.getRepository();
+    }
+
+    private void initTable() throws Exception {
+        tbNasaImages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tbNasaImages.setAutoCreateRowSorter(true);
+        tbNasaImages.setRowHeight(25);
+        nasaImagesTableModel = new NasaImageTableModel(repository.selectNasaImages());
+        tbNasaImages.setModel(nasaImagesTableModel);
+    }
+
+    private void initComboBox() throws Exception {
+        DefaultComboBoxModel<Mission> missionModel = new DefaultComboBoxModel<>();
+        missionModel.addElement(null);
+        repository.selectMissions().forEach(missionModel::addElement);
+        cbMission.setModel(missionModel);
+
+        DefaultComboBoxModel<Photographer> photographerModel = new DefaultComboBoxModel<>();
+        photographerModel.addElement(null);
+        repository.selectPhotographers().forEach(photographerModel::addElement);
+        cbPhotographer.setModel(photographerModel);
+
+        cbColumnSort.setModel(new DefaultComboBoxModel<>(new String[]{"Id", "Title", "Link", "Published date"}));
+        spTitleLength.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+        rbAsc.setSelected(true);
+    }
+
+    private void fillForm(NasaImage nasaImage) {
+        if (nasaImage.getPicturePath() != null && Files.exists(Paths.get(nasaImage.getPicturePath()))) {
+            tfPicturePath.setText(nasaImage.getPicturePath());
+            setIcon(lbIcon, new File(nasaImage.getPicturePath()));
+        }
+        tfTitle.setText(nasaImage.getTitle());
+        tfLink.setText(nasaImage.getLink());
+        taDesc.setText(nasaImage.getDescription());
+        tfDate.setText(nasaImage.getPublishedDate().format(NasaImage.DATE_FORMATTER));
+
+        for (int i = 0; i < cbMission.getItemCount(); i++) {
+            Mission m = cbMission.getItemAt(i);
+            if (m != null && nasaImage.getIdMission() != null && m.getId() == nasaImage.getIdMission()) {
+                cbMission.setSelectedIndex(i);
+                break;
+            }
+        }
+
+        for (int i = 0; i < cbPhotographer.getItemCount(); i++) {
+            Photographer p = cbPhotographer.getItemAt(i);
+            if (p != null && nasaImage.getIdPhotographer() != null && p.getId() == nasaImage.getIdPhotographer()) {
+                cbPhotographer.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+
+    private void loadTable() throws Exception {
+        int minLength = (int) spTitleLength.getValue();
+        boolean ascending = rbAsc.isSelected();
+        String column = (String) cbColumnSort.getSelectedItem();
+
+        List<NasaImage> all = repository.selectNasaImages();
+
+        Comparator<NasaImage> comparator = switch (column) {
+            case "Title" ->
+                Comparator.comparing(NasaImage::getTitle);
+            case "Link" ->
+                Comparator.comparing(NasaImage::getLink);
+            case "Published date" ->
+                Comparator.comparing(NasaImage::getPublishedDate);
+            default ->
+                Comparator.comparing(NasaImage::getId);
+        };
+        if (!ascending) {
+            comparator = comparator.reversed();
+        }
+
+        List<NasaImage> filtered = all.stream()
+                .filter(img -> img.getTitle() != null && img.getTitle().length() >= minLength)
+                .sorted(comparator)
+                .collect(java.util.stream.Collectors.toList());
+
+        nasaImagesTableModel.setNasaImages(filtered);
+    }
+
 }

@@ -331,9 +331,7 @@ public class CategoriesPanel extends javax.swing.JPanel {
         tbCategories.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tbCategories.setAutoCreateRowSorter(true);
         tbCategories.setRowHeight(25);
-        List<Category> cats = repository.selectCategories();
-        System.out.println("Categories loaded: " + cats.size());
-        categoriesTableModel = new CategoryTableModel(cats);
+        categoriesTableModel = new CategoryTableModel(repository.selectCategories());
         tbCategories.setModel(categoriesTableModel);
     }
 
