@@ -4,11 +4,39 @@
  */
 package hr.alrebra.view;
 
+import hr.algebra.dal.Repository;
+import hr.algebra.dal.RepositoryFactory;
+import hr.algebra.model.Category;
+import hr.algebra.model.Mission;
+import hr.algebra.model.NasaImage;
+import hr.algebra.model.Photographer;
+import hr.algebra.utilities.MessageUtils;
+import java.awt.datatransfer.Transferable;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.TransferHandler;
+
 /**
  *
  * @author kvash
  */
 public class ImageCategoriesPanel extends javax.swing.JPanel {
+
+    private Repository repository;
+    private DefaultListModel<Category> availableModel;
+    private DefaultListModel<Category> assignedModel;
+
+    private List<Category> draggedCategories;
+    private JList<Category> dragSourceList;
 
     /**
      * Creates new form ImageCategoriesPanel
@@ -24,19 +52,268 @@ public class ImageCategoriesPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lbTitle = new javax.swing.JLabel();
+        lbDesc1 = new javax.swing.JLabel();
+        lbDesc2 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        lbSelect = new javax.swing.JLabel();
+        cbImage = new javax.swing.JComboBox<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        lAvailible = new javax.swing.JList<>();
+        lbAvailible = new javax.swing.JLabel();
+        lbCurrent = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        lAssigned = new javax.swing.JList<>();
+        lbStatus = new javax.swing.JLabel();
+
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
+
+        lbTitle.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lbTitle.setText("Explore capabilities");
+
+        lbDesc1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbDesc1.setText("You can see all the categories of a particular nasa image and assign them.");
+
+        lbDesc2.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        lbDesc2.setText("Select an image first, then drag&drop categories from the Availible categories to Image's categories.");
+
+        lbSelect.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbSelect.setText("Select image:");
+
+        cbImage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cbImage.addActionListener(this::cbImageActionPerformed);
+
+        lAvailible.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jScrollPane1.setViewportView(lAvailible);
+
+        lbAvailible.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lbAvailible.setText("Availible categories");
+
+        lbCurrent.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lbCurrent.setText("Image's categories");
+
+        lAssigned.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jScrollPane2.setViewportView(lAssigned);
+
+        lbStatus.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        lbStatus.setForeground(new java.awt.Color(0, 0, 0));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lbAvailible, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(121, 121, 121)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lbCurrent, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 1121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbDesc2, javax.swing.GroupLayout.PREFERRED_SIZE, 623, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbDesc1, javax.swing.GroupLayout.PREFERRED_SIZE, 509, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lbSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(29, 29, 29)
+                                .addComponent(cbImage, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(36, 36, 36)
+                .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lbDesc1)
+                .addGap(18, 18, 18)
+                .addComponent(lbDesc2)
+                .addGap(47, 47, 47)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbSelect)
+                    .addComponent(cbImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(47, 47, 47)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbAvailible)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbCurrent)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2)))
+                .addGap(18, 18, 18)
+                .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(86, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        init();
+    }//GEN-LAST:event_formComponentShown
+
+    private void cbImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbImageActionPerformed
+        try {
+            loadCategories();
+        } catch (Exception ex) {
+            Logger.getLogger(ImageCategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to set a nasa image!");
+        }
+    }//GEN-LAST:event_cbImageActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<NasaImage> cbImage;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JList<Category> lAssigned;
+    private javax.swing.JList<Category> lAvailible;
+    private javax.swing.JLabel lbAvailible;
+    private javax.swing.JLabel lbCurrent;
+    private javax.swing.JLabel lbDesc1;
+    private javax.swing.JLabel lbDesc2;
+    private javax.swing.JLabel lbSelect;
+    private javax.swing.JLabel lbStatus;
+    private javax.swing.JLabel lbTitle;
     // End of variables declaration//GEN-END:variables
+
+    private void init() {
+        try {
+            initRepository();
+
+            availableModel = new DefaultListModel<>();
+            lAvailible.setModel(availableModel);
+            lAvailible.setDragEnabled(true);
+            lAvailible.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+            assignedModel = new DefaultListModel<>();
+            lAssigned.setModel(assignedModel);
+            lAssigned.setDragEnabled(true);
+            lAssigned.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+            var transferHandler = new CategoryTransferHandler();
+            lAvailible.setTransferHandler(transferHandler);
+            lAssigned.setTransferHandler(transferHandler);
+
+            initComboBox();
+
+        } catch (Exception ex) {
+            Logger.getLogger(ImageCategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
+            //ex.printStackTrace();
+            MessageUtils.showErrorMessage("Unrecoverable error", "Cannot initiate the form");
+        }
+    }
+
+    private void initRepository() throws Exception {
+        repository = RepositoryFactory.getRepository();
+    }
+
+    private void initComboBox() throws Exception {
+        DefaultComboBoxModel<NasaImage> nasaImageModel = new DefaultComboBoxModel<>();
+        nasaImageModel.addElement(null);
+        repository.selectNasaImages().forEach(nasaImageModel::addElement);
+        cbImage.setModel(nasaImageModel);
+    }
+
+    private void loadCategories() throws Exception {
+        NasaImage currentImage = (NasaImage) cbImage.getSelectedItem();
+        if (currentImage == null) {
+            availableModel.removeAllElements();
+            assignedModel.removeAllElements();
+            return;
+        }
+
+        Set<Category> assigned = new TreeSet<>(repository.selectCategoriesForImage(currentImage.getId()));
+        Set<Category> all = new TreeSet<>(repository.selectCategories());
+
+        all.removeIf(assigned::contains);
+        availableModel.clear();
+        availableModel.addAll(all);
+        assignedModel.clear();
+        assignedModel.addAll(assigned);
+
+        lAvailible.setModel(availableModel);
+        lAssigned.setModel(assignedModel);
+    }
+
+    private class CategoryTransferHandler extends TransferHandler {
+
+        public CategoryTransferHandler() {
+        }
+
+        @Override
+        protected Transferable createTransferable(JComponent c) {
+            dragSourceList = (JList<Category>) c;
+            draggedCategories = dragSourceList.getSelectedValuesList();
+            return new java.awt.datatransfer.StringSelection(draggedCategories.toString());
+        }
+
+        // defines what kind of operation is allowed (move)
+        @Override
+        public int getSourceActions(JComponent c) {
+            return TransferHandler.MOVE;
+        }
+
+        // list allowed to accept the drop ? true : false
+        @Override
+        public boolean canImport(TransferSupport support) {
+            //System.out.println("canImport called on: " + support.getComponent());
+            return true;
+        }
+
+        @Override
+        public boolean importData(TransferSupport support) {
+            if (draggedCategories == null || draggedCategories.isEmpty()) {
+                return false;
+            }
+
+            NasaImage currentImage = (NasaImage) cbImage.getSelectedItem();
+            if (currentImage == null) {
+                return false;
+            }
+
+            JList<Category> dropTarget = (JList<Category>) support.getComponent();
+
+            // prevent dropping on same list
+            if (dropTarget == dragSourceList) {
+                return false;
+            }
+
+            DefaultListModel<Category> fromModel = dragSourceList == lAvailible ? availableModel : assignedModel;
+            DefaultListModel<Category> toModel = dropTarget == lAssigned ? assignedModel : availableModel;
+
+            try {
+                for (Category cat : draggedCategories) {
+                    fromModel.removeElement(cat);
+                    toModel.addElement(cat);
+                    if (dropTarget == lAssigned) {
+                        repository.addCategoryToImage(currentImage.getId(), cat.getId());
+                    } else {
+                        repository.removeCategoryFromImage(currentImage.getId(), cat.getId());
+                    }
+                }
+                lbStatus.setText("Moved " + draggedCategories.size() + " categories");
+                draggedCategories = null;
+                return true;
+            } catch (Exception ex) {
+                Logger.getLogger(ImageCategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
+        }
+
+    }
 }

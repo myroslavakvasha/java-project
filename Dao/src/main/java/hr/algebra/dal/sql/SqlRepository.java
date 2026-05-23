@@ -429,7 +429,7 @@ public class SqlRepository implements Repository {
         DataSource dataSource = DataSourceSingleton.getInstance();
         try (Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_CATEGORIES_FOR_IMAGE)) {
 
-            stmt.setInt(ID, idImage);
+            stmt.setInt(ID_NASA_IMAGE, idImage);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     categories.add(new Category(rs.getInt(ID), rs.getString(NAME)));

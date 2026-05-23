@@ -66,7 +66,7 @@ public final class Category implements Comparable<Category>{
 
     @Override
     public String toString() {
-        return "Category{" + "id=" + id + ", name=" + name + '}';
+        return name;
     }
 
     @Override
