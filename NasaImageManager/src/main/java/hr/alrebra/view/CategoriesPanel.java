@@ -9,7 +9,6 @@ import hr.algebra.dal.RepositoryFactory;
 import hr.algebra.utilities.MessageUtils;
 import hr.alrebra.view.model.CategoryTableModel;
 import hr.algebra.model.Category;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;

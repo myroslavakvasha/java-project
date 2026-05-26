@@ -7,9 +7,7 @@ package hr.alrebra.view;
 import hr.algebra.dal.Repository;
 import hr.algebra.dal.RepositoryFactory;
 import hr.algebra.model.Category;
-import hr.algebra.model.Mission;
 import hr.algebra.model.NasaImage;
-import hr.algebra.model.Photographer;
 import hr.algebra.utilities.MessageUtils;
 import java.awt.datatransfer.Transferable;
 import java.util.List;
@@ -22,7 +20,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.TransferHandler;
 
 /**

@@ -12,8 +12,8 @@ import java.util.Optional;
  */
 public enum Role {
     
-    ADMIN("admin"),
-    USER("user");
+    ADMIN("ADMIN"),
+    USER("USER");
     
     private final String name;
     

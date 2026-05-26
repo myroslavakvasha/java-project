@@ -5,6 +5,7 @@
 package hr.algebra;
 
 import hr.algebra.model.Role;
+import hr.algebra.model.User;
 import hr.alrebra.view.CategoriesPanel;
 import hr.alrebra.view.MissionsPanel;
 import hr.alrebra.view.NasaImagesPanel;
@@ -23,10 +24,10 @@ public class NasaImageManager extends javax.swing.JFrame {
     /**
      * Creates new form NasaImageManager
      */
-    public NasaImageManager(Role role) {
+    public NasaImageManager(User user) {
         initComponents();
-        configurePanels(role);
-        configureMenu(role);
+        configurePanels(user);
+        configureMenu(user);
     }
 
     /**
@@ -80,27 +81,27 @@ public class NasaImageManager extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new NasaImageManager(hr.algebra.model.Role.USER).setVisible(true));
-    }
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+//            logger.log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(() -> new NasaImageManager(hr.algebra.model.Role.USER).setVisible(true));
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu mOptions;
@@ -111,8 +112,8 @@ public class NasaImageManager extends javax.swing.JFrame {
     private javax.swing.JTabbedPane tpContent;
     // End of variables declaration//GEN-END:variables
 
-    private void configurePanels(Role role) {
-        if (role == Role.ADMIN) {
+    private void configurePanels(User user) {
+        if (user.getRole() == Role.ADMIN) {
             tpContent.add("Upload", new UploadPanel());
         } else {
             tpContent.add("NASA Images", new NasaImagesPanel());
@@ -123,22 +124,22 @@ public class NasaImageManager extends javax.swing.JFrame {
         }
     }
 
-    private void configureMenu(Role role) {
+    private void configureMenu(User user) {
         // hide Tools menu for admin — they don't need XML export
-        mTools.setVisible(role == Role.USER);
+        mTools.setVisible(user.getRole() == Role.USER);
 
-//        miLogout.addActionListener(e -> logout());
+        miLogout.addActionListener(e -> logout());
 //        miExport.addActionListener(e -> exportXml());
     }
 
-    /*
     private void logout() {
-        new LoginForm().setVisible(true);
+        new Login().setVisible(true);
         this.dispose();
     }
 
+    /*
     private void exportXml() {
         // implement later with JAXB
     }
-*/
+     */
 }

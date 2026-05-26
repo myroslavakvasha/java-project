@@ -22,6 +22,6 @@
     </dependencies>
     <properties>
         <maven.compiler.release>25</maven.compiler.release>
-        <exec.mainClass>hr.algebra.NasaImageManager</exec.mainClass>
+        <exec.mainClass>hr.algebra.Login</exec.mainClass>
     </properties>
 </project>
