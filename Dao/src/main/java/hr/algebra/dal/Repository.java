@@ -9,6 +9,7 @@ import hr.algebra.model.Mission;
 import hr.algebra.model.NasaImage;
 import hr.algebra.model.Photographer;
 import hr.algebra.model.User;
+import hr.algebra.model.dto.NasaImageExportDto;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,4 +51,7 @@ public interface Repository {
 
     void createUser(User user) throws Exception;
     Optional<User> selectUserByUsername(String username) throws Exception;
+    
+    List<NasaImageExportDto> selectNasaImagesForExport() throws Exception;
+    List<String> selectCategoryNamesForImage(int idImage) throws Exception;
 }

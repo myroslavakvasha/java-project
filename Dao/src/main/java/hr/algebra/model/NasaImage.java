@@ -6,11 +6,16 @@ package hr.algebra.model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author kvash
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {"id", "title", "link", "description", "picturePath", "publishedDate"})
 public final class NasaImage implements Comparable<NasaImage> {
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;

@@ -11,6 +11,7 @@ import hr.algebra.model.NasaImage;
 import hr.algebra.model.Photographer;
 import hr.algebra.model.Role;
 import hr.algebra.model.User;
+import hr.algebra.model.dto.NasaImageExportDto;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -42,6 +43,8 @@ public class SqlRepository implements Repository {
     private static final String USERNAME = "Username";
     private static final String PASSWORDHASH = "PasswordHash";
     private static final String ROLE = "Role";
+    private static final String MISSION_NAME = "MissionName";
+    private static final String PHOTOGRAPHER_NAME = "PhotographerName";
 
     private static final String CREATE_NASA_IMAGE = "{ CALL createNasaImage (?,?,?,?,?,?,?,?) }";
     private static final String UPDATE_NASA_IMAGE = "{ CALL updateNasaImage (?,?,?,?,?,?,?,?) }";
@@ -73,16 +76,18 @@ public class SqlRepository implements Repository {
 
     private static final String CREATE_USER = "{ CALL createUser (?,?,?) }";
     private static final String SELECT_USER_BY_USERNAME = "{ CALL selectUserByUsername (?) }";
-    
+
     private static final String DELETE_ALL = "{ CALL deleteAll }";
+
+    private static final String SELECT_NASA_IMAGES_FOR_EXPORT = "{ CALL selectNasaImagesForExport }";
+    private static final String SELECT_CATEGORY_NAMES_FOR_IMAGE = "{ CALL selectCategoryNamesForImage (?) }";
 
     @Override
     public int createNasaImage(NasaImage image) throws Exception {
         DataSource dataSource = DataSourceSingleton.getInstance();
         try (
                 // get a connection to the db
-                Connection con = dataSource.getConnection();
-                // prepare the call ("get ready for this procedure")
+                Connection con = dataSource.getConnection(); // prepare the call ("get ready for this procedure")
                  CallableStatement stmt = con.prepareCall(CREATE_NASA_IMAGE)) {
 
             // bind input values to ? placeholders
@@ -206,9 +211,7 @@ public class SqlRepository implements Repository {
         List<NasaImage> images = new ArrayList<>();
         DataSource dataSource = DataSourceSingleton.getInstance();
         try (
-                Connection con = dataSource.getConnection();
-                CallableStatement stmt = con.prepareCall(SELECT_NASA_IMAGES);
-                ResultSet rs = stmt.executeQuery()) {
+                Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_NASA_IMAGES); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 images.add(new NasaImage(
@@ -258,9 +261,7 @@ public class SqlRepository implements Repository {
         List<Category> categories = new ArrayList<>();
         DataSource dataSource = DataSourceSingleton.getInstance();
         try (
-                Connection con = dataSource.getConnection();
-                CallableStatement stmt = con.prepareCall(SELECT_CATEGORIES);
-                ResultSet rs = stmt.executeQuery();) {
+                Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_CATEGORIES); ResultSet rs = stmt.executeQuery();) {
 
             while (rs.next()) {
                 categories.add(new Category(rs.getInt(ID), rs.getString(NAME)));
@@ -268,7 +269,7 @@ public class SqlRepository implements Repository {
         }
         return categories;
     }
-    
+
     @Override
     public Optional<Category> selectCategory(int id) throws Exception {
         DataSource dataSource = DataSourceSingleton.getInstance();
@@ -318,9 +319,7 @@ public class SqlRepository implements Repository {
         List<Mission> missions = new ArrayList<>();
         DataSource dataSource = DataSourceSingleton.getInstance();
         try (
-                Connection con = dataSource.getConnection();
-                CallableStatement stmt = con.prepareCall(SELECT_MISSIONS);
-                ResultSet rs = stmt.executeQuery()) {
+                Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_MISSIONS); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 missions.add(new Mission(rs.getInt(ID), rs.getString(NAME), rs.getString(DESCRIPTION)));
@@ -328,7 +327,7 @@ public class SqlRepository implements Repository {
         }
         return missions;
     }
-    
+
     @Override
     public Optional<Mission> selectMission(int id) throws Exception {
         DataSource dataSource = DataSourceSingleton.getInstance();
@@ -378,9 +377,7 @@ public class SqlRepository implements Repository {
         List<Photographer> photographers = new ArrayList<>();
         DataSource dataSource = DataSourceSingleton.getInstance();
         try (
-                Connection con = dataSource.getConnection();
-                CallableStatement stmt = con.prepareCall(SELECT_PHOTOGRAPHERS);
-                ResultSet rs = stmt.executeQuery()) {
+                Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_PHOTOGRAPHERS); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 photographers.add(new Photographer(rs.getInt(ID), rs.getString(NAME), rs.getString(SURNAME)));
@@ -388,7 +385,7 @@ public class SqlRepository implements Repository {
         }
         return photographers;
     }
-    
+
     @Override
     public Optional<Photographer> selectPhotographer(int id) throws Exception {
         DataSource dataSource = DataSourceSingleton.getInstance();
@@ -453,10 +450,10 @@ public class SqlRepository implements Repository {
     @Override
     public Optional<User> selectUserByUsername(String username) throws Exception {
         DataSource dataSource = DataSourceSingleton.getInstance();
-        try (Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_USER_BY_USERNAME)){
+        try (Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_USER_BY_USERNAME)) {
             stmt.setString(USERNAME, username);
-            try(ResultSet rs = stmt.executeQuery()){
-                while(rs.next()){
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
                     return Optional.of(new User(
                             rs.getInt(ID),
                             rs.getString(USERNAME),
@@ -471,9 +468,51 @@ public class SqlRepository implements Repository {
     @Override
     public void deleteAll() throws Exception {
         DataSource dataSource = DataSourceSingleton.getInstance();
-        try(Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(DELETE_ALL);){
+        try (Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(DELETE_ALL);) {
             stmt.executeUpdate();
         }
     }
 
+    @Override
+    public List<NasaImageExportDto> selectNasaImagesForExport() throws Exception {
+        List<NasaImageExportDto> images = new ArrayList<>();
+        DataSource dataSource = DataSourceSingleton.getInstance();
+        try (
+                Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_NASA_IMAGES_FOR_EXPORT); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                images.add(new NasaImageExportDto(
+                        rs.getInt(ID),
+                        rs.getString(TITLE),
+                        rs.getString(LINK),
+                        rs.getString(DESCRIPTION),
+                        rs.getString(PICTURE_PATH),
+                        LocalDateTime.parse(rs.getString(PUBLISHED_DATE), NasaImage.DATE_FORMATTER),
+                        rs.getString(MISSION_NAME),
+                        rs.getString(PHOTOGRAPHER_NAME)));
+            }
+        }
+
+        for (NasaImageExportDto dto : images) {
+            dto.setCategoryNames(selectCategoryNamesForImage(dto.getId()));
+        }
+        
+        return images;
+    }
+
+    @Override
+    public List<String> selectCategoryNamesForImage(int idImage) throws Exception {
+        List<String> categories = new ArrayList<>();
+        DataSource dataSource = DataSourceSingleton.getInstance();
+        try (Connection con = dataSource.getConnection(); CallableStatement stmt = con.prepareCall(SELECT_CATEGORY_NAMES_FOR_IMAGE)) {
+
+            stmt.setInt(ID_NASA_IMAGE, idImage);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    categories.add(rs.getString(NAME));
+                }
+            }
+        }
+        return categories;
+    }
 }

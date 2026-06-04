@@ -196,12 +196,14 @@ public class ImageCategoriesPanel extends javax.swing.JPanel {
             lAvailible.setModel(availableModel);
             lAvailible.setDragEnabled(true);
             lAvailible.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            // select one or more contiguous ranges of indices at a time.
 
             assignedModel = new DefaultListModel<>();
             lAssigned.setModel(assignedModel);
             lAssigned.setDragEnabled(true);
             lAssigned.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
+            // one handler for both cause both lists need to do the same operations
             var transferHandler = new CategoryTransferHandler();
             lAvailible.setTransferHandler(transferHandler);
             lAssigned.setTransferHandler(transferHandler);
@@ -237,7 +239,7 @@ public class ImageCategoriesPanel extends javax.swing.JPanel {
         Set<Category> assigned = new TreeSet<>(repository.selectCategoriesForImage(currentImage.getId()));
         Set<Category> all = new TreeSet<>(repository.selectCategories());
 
-        all.removeIf(assigned::contains);
+        all.removeIf(assigned::contains); // predicate
         availableModel.clear();
         availableModel.addAll(all);
         assignedModel.clear();
@@ -252,28 +254,36 @@ public class ImageCategoriesPanel extends javax.swing.JPanel {
         public CategoryTransferHandler() {
         }
 
+        // "packing up" the stuff that's being dragged
         @Override
         protected Transferable createTransferable(JComponent c) {
             dragSourceList = (JList<Category>) c;
             draggedCategories = dragSourceList.getSelectedValuesList();
+
+            // not putting the actual data, just the string representation, because it's the same
+            // handler and the data is directly inside an object, so no need to extract it later
             return new java.awt.datatransfer.StringSelection(draggedCategories.toString());
         }
 
-        // defines what kind of operation is allowed (move)
+        // defines what kind of operation is allowed (move) - purely declarative
         @Override
         public int getSourceActions(JComponent c) {
             return TransferHandler.MOVE;
         }
 
         // list allowed to accept the drop ? true : false
+        // called repeatedly each time cursor moves
+        // always true because the flavor check would be meaningless since im not actually extracting stuff
         @Override
         public boolean canImport(TransferSupport support) {
             //System.out.println("canImport called on: " + support.getComponent());
             return true;
         }
 
+        // called when the user releases the mouse, runs on the target side
         @Override
         public boolean importData(TransferSupport support) {
+            // protecting against external drop (or something else that's not a drag from the app itself)
             if (draggedCategories == null || draggedCategories.isEmpty()) {
                 return false;
             }
@@ -283,6 +293,7 @@ public class ImageCategoriesPanel extends javax.swing.JPanel {
                 return false;
             }
 
+            // getting component the user dropped onto (which list received the drop - either of the two can)
             JList<Category> dropTarget = (JList<Category>) support.getComponent();
 
             // prevent dropping on same list
@@ -290,12 +301,13 @@ public class ImageCategoriesPanel extends javax.swing.JPanel {
                 return false;
             }
 
+            // figuring out which list in src and which dest
             DefaultListModel<Category> fromModel = dragSourceList == lAvailible ? availableModel : assignedModel;
             DefaultListModel<Category> toModel = dropTarget == lAssigned ? assignedModel : availableModel;
 
             try {
                 for (Category cat : draggedCategories) {
-                    fromModel.removeElement(cat);
+                    //fromModel.removeElement(cat);
                     toModel.addElement(cat);
                     if (dropTarget == lAssigned) {
                         repository.addCategoryToImage(currentImage.getId(), cat.getId());
@@ -304,12 +316,24 @@ public class ImageCategoriesPanel extends javax.swing.JPanel {
                     }
                 }
                 lbStatus.setText("Moved " + draggedCategories.size() + " categories");
-                draggedCategories = null;
-                return true;
+                //draggedCategories = null; // cleanup
+                return true; // success
             } catch (Exception ex) {
                 Logger.getLogger(ImageCategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
+        }
+
+        // executes on the source after importData, cleanup
+        @Override
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            if (action == TransferHandler.MOVE && draggedCategories != null) {
+                DefaultListModel<Category> fromModel = dragSourceList == lAvailible ? availableModel : assignedModel;
+                for (Category cat : draggedCategories) {
+                    fromModel.removeElement(cat);
+                }
+            }
+            draggedCategories = null; // cleanup regardless of outcome
         }
 
     }

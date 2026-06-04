@@ -4,14 +4,23 @@
  */
 package hr.algebra;
 
+import hr.algebra.dal.Repository;
+import hr.algebra.dal.RepositoryFactory;
 import hr.algebra.model.Role;
 import hr.algebra.model.User;
+import hr.algebra.model.dto.NasaImageExportDto;
+import hr.algebra.model.export.NasaImageExportList;
 import hr.alrebra.view.CategoriesPanel;
 import hr.alrebra.view.MissionsPanel;
 import hr.alrebra.view.NasaImagesPanel;
 import hr.alrebra.view.UploadPanel;
 import hr.alrebra.view.PhotographersPanel;
 import hr.alrebra.view.ImageCategoriesPanel;
+import java.io.File;
+import hr.algebra.utilities.FileUtils;
+import hr.algebra.utilities.MessageUtils;
+import hr.algebra.utilities.jaxb.JAXBUtils;
+import java.util.List;
 
 /**
  *
@@ -129,7 +138,7 @@ public class NasaImageManager extends javax.swing.JFrame {
         mTools.setVisible(user.getRole() == Role.USER);
 
         miLogout.addActionListener(e -> logout());
-//        miExport.addActionListener(e -> exportXml());
+        miExport.addActionListener(e -> exportXml());
     }
 
     private void logout() {
@@ -137,9 +146,17 @@ public class NasaImageManager extends javax.swing.JFrame {
         this.dispose();
     }
 
-    /*
     private void exportXml() {
-        // implement later with JAXB
+        File file = FileUtils.saveFile("XML Files", "xml");
+        if (file != null) {
+            try {
+                Repository repo = RepositoryFactory.getRepository();
+                List<NasaImageExportDto> dtos = repo.selectNasaImagesForExport();
+                JAXBUtils.marshal(new NasaImageExportList(dtos), file.getAbsolutePath());
+                MessageUtils.showInformationMessage("Export", "Export successful!");
+            } catch (Exception e) {
+                MessageUtils.showErrorMessage("Export", "Export failed: " + e.getMessage());
+            }
+        }
     }
-     */
 }

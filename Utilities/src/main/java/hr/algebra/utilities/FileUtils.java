@@ -28,6 +28,7 @@ public class FileUtils {
     }
 
     private static final String UPLOAD = "Upload";
+    private static final String EXPORT = "Export";
 
     public static File uploadFile(String description, String... extensions) {
         JFileChooser chooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -40,6 +41,26 @@ public class FileUtils {
             File selectedFile = chooser.getSelectedFile();
             String extension = selectedFile.getName().substring(selectedFile.getName().lastIndexOf(".") + 1);
             return selectedFile.exists() && Arrays.asList(extensions).contains(extension.toLowerCase()) ? selectedFile : null;
+        }
+        return null;
+    }
+
+    public static File saveFile(String description, String extension) {
+        JFileChooser chooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        chooser.setFileFilter(new FileNameExtensionFilter(description, extension));
+        chooser.setDialogTitle(EXPORT);
+        chooser.setApproveButtonText(EXPORT);
+        chooser.setApproveButtonToolTipText(EXPORT);
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setSelectedFile(new File("nasa_images." + extension));
+
+        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            // ensure extension is appended if user removed it
+            if (!file.getName().toLowerCase().endsWith("." + extension)) {
+                file = new File(file.getAbsolutePath() + "." + extension);
+            }
+            return file;
         }
         return null;
     }
