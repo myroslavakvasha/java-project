@@ -6,7 +6,12 @@ package hr.alrebra.view;
 
 import hr.algebra.dal.Repository;
 import hr.algebra.dal.RepositoryFactory;
+import hr.algebra.model.Category;
+import hr.algebra.model.EnrichedImage;
+import hr.algebra.model.Mission;
 import hr.algebra.model.NasaImage;
+import hr.algebra.model.Photographer;
+import hr.algebra.parsers.rss.ImageEnricher;
 import hr.algebra.utilities.MessageUtils;
 import java.util.List;
 import java.util.logging.Level;
@@ -99,11 +104,28 @@ public class UploadPanel extends javax.swing.JPanel {
         try {
             repository.deleteAll(); // deleting the data before uploading new from rss to avoid duplicates (seeded data stays)
             List<NasaImage> images = NasaImageParser.parse(); // fetching new data from rss
-            repository.createNasaImages(images);
+            
+            // here enrich each image separately
+            // to add categories (m-to-n entity) we need to create each image separately, not in the batch
+            // (we need to get the id of each image)
+            
+            List<Mission> missions = repository.selectMissions();
+            List<Photographer> photographers = repository.selectPhotographers();
+            List<Category> categories = repository.selectCategories();
+            
+            List<EnrichedImage> enrichedImages = ImageEnricher.enrich(images, missions, categories, photographers);
+            
+            for (EnrichedImage enrichedImage : enrichedImages) {
+                int imageId = repository.createNasaImage(enrichedImage.getImage());
+                for (Category c : enrichedImage.getMatchedCategories()) {
+                    repository.addCategoryToImage(imageId, c.getId());
+                }
+            }
+            
             loadModel();
         } catch (Exception ex) {
+            ex.printStackTrace();
             MessageUtils.showErrorMessage("Unrecoverable error", "Unable to upload articles");
-            System.exit(1);
         }
     }//GEN-LAST:event_btnRefreshActionPerformed
 

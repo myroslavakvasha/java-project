@@ -56,7 +56,6 @@ public class FileUtils {
 
         if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
-            // ensure extension is appended if user removed it
             if (!file.getName().toLowerCase().endsWith("." + extension)) {
                 file = new File(file.getAbsolutePath() + "." + extension);
             }
