@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.ListSelectionModel;
@@ -756,9 +757,9 @@ public class NasaImagesPanel extends javax.swing.JPanel {
         List<NasaImage> filtered = all.stream()
                 .filter(img -> img.getTitle() != null && img.getTitle().length() >= minLength)
                 .sorted(comparator)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
 
-        nasaImagesTableModel.setNasaImages(filtered);
+        nasaImagesTableModel.setItems(filtered);
     }
 
 }

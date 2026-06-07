@@ -4,7 +4,7 @@
  */
 package hr.algebra.model;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -13,12 +13,12 @@ import java.util.List;
 public final class EnrichedImage {
 
     NasaImage image;
-    List<Category> matchedCategories;
+    Set<Category> matchedCategories;
 
     public EnrichedImage() {
     }
 
-    public EnrichedImage(NasaImage image, List<Category> matchedCategories) {
+    public EnrichedImage(NasaImage image, Set<Category> matchedCategories) {
         this.image = image;
         this.matchedCategories = matchedCategories;
     }
@@ -27,7 +27,7 @@ public final class EnrichedImage {
         return image;
     }
 
-    public List<Category> getMatchedCategories() {
+    public Set<Category> getMatchedCategories() {
         return matchedCategories;
     }
 

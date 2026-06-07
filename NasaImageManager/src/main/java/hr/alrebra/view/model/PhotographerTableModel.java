@@ -12,55 +12,31 @@ import hr.algebra.model.Photographer;
  *
  * @author kvash
  */
-public class PhotographerTableModel extends AbstractTableModel{
-    
+public class PhotographerTableModel extends BaseTableModel<Photographer> {
+
     private static final String[] COLUMN_NAMES = {"Id", "Name", "Surname"};
-    private List<Photographer> photographers;
 
-    public PhotographerTableModel(List<Photographer> photographers) {
-        this.photographers = photographers;
-    }
-
-    public void setPhotographers(List<Photographer> photographers) {
-        this.photographers = photographers;
-        fireTableDataChanged();
+    public PhotographerTableModel(List<Photographer> items) {
+        super(items);
     }
 
     @Override
-    public int getRowCount() {
-        return photographers.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return COLUMN_NAMES.length;
+    protected String[] getColumnNames() {
+        return COLUMN_NAMES;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        Photographer p = items.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return photographers.get(rowIndex).getId();
+                return p.getId();
             case 1:
-                return photographers.get(rowIndex).getName();
+                return p.getName();
             case 2:
-                return photographers.get(rowIndex).getSurname();
+                return p.getSurname();
             default:
                 throw new RuntimeException("No such column");
         }
-    }
-
-    @Override
-    public String getColumnName(int column) {
-        return COLUMN_NAMES[column];
-    }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        switch (columnIndex) {
-            case 0:
-                return Integer.class;
-        }
-        return super.getColumnClass(columnIndex);
     }
 }

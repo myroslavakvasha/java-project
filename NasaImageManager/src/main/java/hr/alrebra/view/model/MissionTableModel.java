@@ -12,56 +12,31 @@ import hr.algebra.model.Mission;
  *
  * @author kvash
  */
-public class MissionTableModel extends AbstractTableModel {
+public class MissionTableModel extends BaseTableModel<Mission> {
 
     private static final String[] COLUMN_NAMES = {"Id", "Name", "Description"};
-    private List<Mission> missions;
 
-    public MissionTableModel(List<Mission> missions) {
-        this.missions = missions;
-    }
-
-    public void setMissions(List<Mission> missions) {
-        this.missions = missions;
-        fireTableDataChanged();
+    public MissionTableModel(List<Mission> items) {
+        super(items);
     }
 
     @Override
-    public int getRowCount() {
-        return missions.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return COLUMN_NAMES.length;
+    protected String[] getColumnNames() {
+        return COLUMN_NAMES;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        Mission m = items.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return missions.get(rowIndex).getId();
+                return m.getId();
             case 1:
-                return missions.get(rowIndex).getName();
+                return m.getName();
             case 2:
-                return missions.get(rowIndex).getDescription();
+                return m.getDescription();
             default:
                 throw new RuntimeException("No such column");
         }
     }
-
-    @Override
-    public String getColumnName(int column) {
-        return COLUMN_NAMES[column];
-    }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        switch (columnIndex) {
-            case 0:
-                return Integer.class;
-        }
-        return super.getColumnClass(columnIndex);
-    }
-
 }

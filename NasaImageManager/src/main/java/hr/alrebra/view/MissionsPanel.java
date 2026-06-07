@@ -240,7 +240,7 @@ public class MissionsPanel extends javax.swing.JPanel {
                 "Do you really want to delete mission?")) {
             try {
                 repository.deleteMission(selectedMission.getId());
-                missionsTableModel.setMissions(repository.selectMissions());
+                missionsTableModel.setItems(repository.selectMissions());
                 clearForm();
             } catch (Exception ex) {
                 Logger.getLogger(MissionsPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -256,7 +256,7 @@ public class MissionsPanel extends javax.swing.JPanel {
         try {
             Mission mission = new Mission(tfName.getText().trim(), tfDesc.getText().trim());
             repository.createMission(mission);
-            missionsTableModel.setMissions(repository.selectMissions());
+            missionsTableModel.setItems(repository.selectMissions());
             clearForm();
         } catch (Exception ex) {
             Logger.getLogger(MissionsPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -276,7 +276,7 @@ public class MissionsPanel extends javax.swing.JPanel {
             selectedMission.setName(tfName.getText().trim());
             selectedMission.setDescription(tfDesc.getText().trim());
             repository.updateMission(selectedMission.getId(), selectedMission);
-            missionsTableModel.setMissions(repository.selectMissions());
+            missionsTableModel.setItems(repository.selectMissions());
             clearForm();
         } catch (Exception ex) {
             Logger.getLogger(MissionsPanel.class.getName()).log(Level.SEVERE, null, ex);

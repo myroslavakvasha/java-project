@@ -16,7 +16,7 @@ import javax.swing.ImageIcon;
  *
  * @author dnlbe
  */
-public class IconUtils {
+public final class IconUtils {
     
     private IconUtils() {}
     

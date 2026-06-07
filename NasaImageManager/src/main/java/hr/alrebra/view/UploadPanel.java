@@ -18,6 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import hr.algebra.parsers.rss.NasaImageParser;
+import hr.algebra.utilities.FileUtils;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -44,7 +46,9 @@ public class UploadPanel extends javax.swing.JPanel {
         btnRefresh = new javax.swing.JButton();
         lbTitle = new javax.swing.JLabel();
         lbDesc1 = new javax.swing.JLabel();
-        lbDesc2 = new javax.swing.JLabel();
+        lbStatus = new javax.swing.JLabel();
+        progressBar = new javax.swing.JProgressBar();
+        lbDesc3 = new javax.swing.JLabel();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -65,8 +69,12 @@ public class UploadPanel extends javax.swing.JPanel {
         lbDesc1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lbDesc1.setText("Currently you can see all the data availible in the database on the main entity.");
 
-        lbDesc2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        lbDesc2.setText("If you wish to refresh the data (delete the old and upload the new from the rss), click the button!");
+        lbStatus.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+
+        progressBar.setBorderPainted(false);
+
+        lbDesc3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbDesc3.setText("If you wish to refresh the data (delete the old and upload the new from the rss), click the button!");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -75,58 +83,92 @@ public class UploadPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbTitle)
-                    .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(spContent, javax.swing.GroupLayout.PREFERRED_SIZE, 1126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(lbDesc1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lbDesc2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(37, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(61, 61, 61)
+                        .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(662, 662, 662))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lbTitle, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbDesc1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbDesc3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 619, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(spContent, javax.swing.GroupLayout.DEFAULT_SIZE, 1130, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(26, 26, 26)
+                .addGap(32, 32, 32)
                 .addComponent(lbTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(lbDesc1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbDesc2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31)
-                .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lbDesc3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(lbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
                 .addComponent(spContent, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(43, 43, 43))
+                .addGap(30, 30, 30)
+                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        try {
-            repository.deleteAll(); // deleting the data before uploading new from rss to avoid duplicates (seeded data stays)
-            List<NasaImage> images = NasaImageParser.parse(); // fetching new data from rss
-            
-            // here enrich each image separately
-            // to add categories (m-to-n entity) we need to create each image separately, not in the batch
-            // (we need to get the id of each image)
-            
-            List<Mission> missions = repository.selectMissions();
-            List<Photographer> photographers = repository.selectPhotographers();
-            List<Category> categories = repository.selectCategories();
-            
-            List<EnrichedImage> enrichedImages = ImageEnricher.enrich(images, missions, categories, photographers);
-            
-            for (EnrichedImage enrichedImage : enrichedImages) {
-                int imageId = repository.createNasaImage(enrichedImage.getImage());
-                for (Category c : enrichedImage.getMatchedCategories()) {
-                    repository.addCategoryToImage(imageId, c.getId());
+        btnRefresh.setEnabled(false);
+        progressBar.setIndeterminate(true);
+        progressBar.setVisible(true);
+
+        new SwingWorker<Void, Void>() {
+
+            @Override
+            protected Void doInBackground() throws Exception {
+                FileUtils.clearDirectory("assets");
+                repository.deleteAll(); // deleting the data before uploading new from rss to avoid duplicates (seeded data stays)
+                List<NasaImage> images = NasaImageParser.parse(); // fetching new data from rss
+
+                // here enrich each image separately
+                // to add categories (m-to-n entity) we need to create each image separately, not in the batch
+                // (we need to get the id of each image)
+                List<Mission> missions = repository.selectMissions();
+                List<Photographer> photographers = repository.selectPhotographers();
+                List<Category> categories = repository.selectCategories();
+
+                List<EnrichedImage> enrichedImages = ImageEnricher.enrich(images, missions, categories, photographers);
+
+                for (EnrichedImage enrichedImage : enrichedImages) {
+                    int imageId = repository.createNasaImage(enrichedImage.getImage());
+                    for (Category c : enrichedImage.getMatchedCategories()) {
+                        repository.addCategoryToImage(imageId, c.getId());
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get(); // rethrows any exception from doInBackground
+                    loadModel();
+                } catch (Exception ex) {
+                    MessageUtils.showErrorMessage("Unrecoverable error", "Unable to upload articles");
+                } finally {
+                    btnRefresh.setEnabled(true);
+                    progressBar.setIndeterminate(false);
+                    progressBar.setVisible(false);
                 }
             }
-            
-            loadModel();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            MessageUtils.showErrorMessage("Unrecoverable error", "Unable to upload articles");
-        }
+        }.execute();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
@@ -137,9 +179,11 @@ public class UploadPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRefresh;
     private javax.swing.JLabel lbDesc1;
-    private javax.swing.JLabel lbDesc2;
+    private javax.swing.JLabel lbDesc3;
+    private javax.swing.JLabel lbStatus;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JList<NasaImage> lsImages;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JScrollPane spContent;
     // End of variables declaration//GEN-END:variables
 
@@ -148,6 +192,7 @@ public class UploadPanel extends javax.swing.JPanel {
 
     private void init() {
         try {
+            progressBar.setVisible(false);
             repository = RepositoryFactory.getRepository();
             nasaImagesModel = new DefaultListModel<>();
             loadModel();
@@ -161,8 +206,12 @@ public class UploadPanel extends javax.swing.JPanel {
     private void loadModel() throws Exception {
         List<NasaImage> images = repository.selectNasaImages();
         nasaImagesModel.clear();
-        images.forEach(nasaImagesModel::addElement);
+        images.forEach(nasaImagesModel::addElement); // consumer
         lsImages.setModel(nasaImagesModel);
+
+        lbStatus.setText(repository.hasData()
+                ? "Showing " + images.size() + " images"
+                : "No data yet — click refresh to load from RSS");
     }
 
 }

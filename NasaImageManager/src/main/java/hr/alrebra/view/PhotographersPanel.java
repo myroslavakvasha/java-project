@@ -164,7 +164,6 @@ public class PhotographersPanel extends javax.swing.JPanel {
                             .addContainerGap(726, Short.MAX_VALUE))
                         .addGroup(layout.createSequentialGroup()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lbDesc1, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(lbDesc2, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(lbRecords)
                                 .addGroup(layout.createSequentialGroup()
@@ -173,7 +172,8 @@ public class PhotographersPanel extends javax.swing.JPanel {
                                     .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(18, 18, 18)
                                     .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lbTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lbDesc1, javax.swing.GroupLayout.PREFERRED_SIZE, 396, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGap(0, 659, Short.MAX_VALUE))
                         .addGroup(layout.createSequentialGroup()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -244,7 +244,7 @@ public class PhotographersPanel extends javax.swing.JPanel {
                 "Do you really want to delete photographer?")) {
             try {
                 repository.deletePhotographer(selectedPhotographer.getId());
-                photographersTableModel.setPhotographers(repository.selectPhotographers());
+                photographersTableModel.setItems(repository.selectPhotographers());
                 clearForm();
             } catch (Exception ex) {
                 Logger.getLogger(PhotographersPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -260,7 +260,7 @@ public class PhotographersPanel extends javax.swing.JPanel {
         try {
             Photographer photographer = new Photographer(tfName.getText().trim(), tfSurname.getText().trim());
             repository.createPhotographer(photographer);
-            photographersTableModel.setPhotographers(repository.selectPhotographers());
+            photographersTableModel.setItems(repository.selectPhotographers());
             clearForm();
         } catch (Exception ex) {
             Logger.getLogger(PhotographersPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -280,7 +280,7 @@ public class PhotographersPanel extends javax.swing.JPanel {
             selectedPhotographer.setName(tfName.getText().trim());
             selectedPhotographer.setSurname(tfSurname.getText().trim());
             repository.updatePhotographer(selectedPhotographer.getId(), selectedPhotographer);
-            photographersTableModel.setPhotographers(repository.selectPhotographers());
+            photographersTableModel.setItems(repository.selectPhotographers());
             clearForm();
         } catch (Exception ex) {
             Logger.getLogger(PhotographersPanel.class.getName()).log(Level.SEVERE, null, ex);

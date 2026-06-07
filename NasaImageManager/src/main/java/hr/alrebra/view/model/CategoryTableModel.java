@@ -12,54 +12,29 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author kvash
  */
-public class CategoryTableModel extends AbstractTableModel {
-    
+public class CategoryTableModel extends BaseTableModel<Category> {
+
     private static final String[] COLUMN_NAMES = {"Id", "Name"};
-    private List<Category> categories;
 
     public CategoryTableModel(List<Category> categories) {
-        this.categories = categories;
+        super(categories);
     }
     
-    public void setCategories(List<Category> categories){
-        this.categories = categories;
-        fireTableDataChanged();
-    }
-
     @Override
-    public int getRowCount() {
-        return categories.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return COLUMN_NAMES.length;
+    protected String[] getColumnNames() {
+        return COLUMN_NAMES;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        switch(columnIndex){
+        Category c = items.get(rowIndex);
+        switch (columnIndex) {
             case 0:
-                return categories.get(rowIndex).getId();
+                return c.getId();
             case 1:
-                return categories.get(rowIndex).getName();
+                return c.getName();
             default:
                 throw new RuntimeException("No such column");
         }
     }
-
-    @Override
-    public String getColumnName(int column) {
-        return COLUMN_NAMES[column];
-    }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        switch (columnIndex) {
-            case 0:
-                return Integer.class;
-        }
-        return super.getColumnClass(columnIndex); 
-    }
-    
 }

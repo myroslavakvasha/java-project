@@ -22,7 +22,7 @@ import javax.swing.filechooser.FileSystemView;
  *
  * @author dnlbe
  */
-public class FileUtils {
+public final class FileUtils {
 
     private FileUtils() {
     }
@@ -84,4 +84,10 @@ public class FileUtils {
         }
     }
 
+    public static void clearDirectory(String dirPath) {
+        File dir = new File(dirPath);
+        if (dir.exists() && dir.isDirectory()) {
+            Arrays.stream(dir.listFiles()).forEach(File::delete);
+        }
+    }
 }

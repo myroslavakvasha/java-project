@@ -12,6 +12,7 @@ import hr.algebra.model.Photographer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -38,16 +39,16 @@ public class ImageEnricher {
                 
                 Optional<Mission> matchedMissionOptional =
                         missions.stream()
-                            .filter(m -> searchText.contains(m.getName().toLowerCase()))
+                            .filter(m -> searchText.contains(m.getName().toLowerCase())) // predicate
                             .findFirst();
                 
-                image.setIdMission(matchedMissionOptional.map(Mission::getId).orElse(10));
+                image.setIdMission(matchedMissionOptional.map(Mission::getId).orElse(10)); // Function used here in .map
                 // in db it's for sure index 10 (identity insert) - Unknown mission
                
-                List<Category> matchedCategories =
+                Set<Category> matchedCategories =
                         categories.stream()
                             .filter(c -> searchText.contains(c.getName().toLowerCase()))
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toSet());
               
                 Photographer currentPhotographer = photographers.get(roundRobinCounter % photographers.size());
                 image.setIdPhotographer(currentPhotographer.getId());

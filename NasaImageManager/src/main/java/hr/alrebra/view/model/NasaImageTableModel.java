@@ -12,68 +12,42 @@ import hr.algebra.model.NasaImage;
  *
  * @author kvash
  */
-public class NasaImageTableModel extends AbstractTableModel {
+public class NasaImageTableModel extends BaseTableModel<NasaImage> {
 
     private static final String[] COLUMN_NAMES
             = {"Id", "Title", "Link", "Description", "Picture path", "Published date", "IdMission", "IdPhotographer"};
 
-    private List<NasaImage> nasaImages;
-
-    public NasaImageTableModel(List<NasaImage> nasaImages) {
-        this.nasaImages = nasaImages;
-    }
-
-    public void setNasaImages(List<NasaImage> nasaImages) {
-        this.nasaImages = nasaImages;
-        fireTableDataChanged();
-    }
-
-    @Override
-    public int getRowCount() {
-        return nasaImages.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return COLUMN_NAMES.length;
+    public NasaImageTableModel(List<NasaImage> items) {
+        super(items);
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        NasaImage i = items.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return nasaImages.get(rowIndex).getId();
+                return i.getId();
             case 1:
-                return nasaImages.get(rowIndex).getTitle();
+                return i.getTitle();
             case 2:
-                return nasaImages.get(rowIndex).getLink();
+                return i.getLink();
             case 3:
-                return nasaImages.get(rowIndex).getDescription();
+                return i.getDescription();
             case 4:
-                return nasaImages.get(rowIndex).getPicturePath();
+                return i.getPicturePath();
             case 5:
-                return nasaImages.get(rowIndex).getPublishedDate().format(NasaImage.DATE_FORMATTER);
+                return i.getPublishedDate().format(NasaImage.DATE_FORMATTER);
             case 6:
-                return nasaImages.get(rowIndex).getIdMission();
+                return i.getIdMission();
             case 7:
-                return nasaImages.get(rowIndex).getIdPhotographer();
+                return i.getIdPhotographer();
             default:
                 throw new RuntimeException("No such column");
         }
     }
 
     @Override
-    public String getColumnName(int column) {
-        return COLUMN_NAMES[column];
+    protected String[] getColumnNames() {
+        return COLUMN_NAMES;
     }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        switch (columnIndex) {
-            case 0:
-                return Integer.class;
-        }
-        return super.getColumnClass(columnIndex);
-    }
-
 }

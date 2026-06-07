@@ -190,7 +190,7 @@ public class CategoriesPanel extends javax.swing.JPanel {
         try {
             Category category = new Category(tfName.getText().trim());
             repository.createCategory(category);
-            categoriesTableModel.setCategories(repository.selectCategories());
+            categoriesTableModel.setItems(repository.selectCategories());
             clearForm();
         } catch (Exception ex) {
             Logger.getLogger(CategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -209,7 +209,7 @@ public class CategoriesPanel extends javax.swing.JPanel {
         try {
             selectedCategory.setName(tfName.getText().trim());
             repository.updateCategory(selectedCategory.getId(), selectedCategory);
-            categoriesTableModel.setCategories(repository.selectCategories());
+            categoriesTableModel.setItems(repository.selectCategories());
             clearForm();
         } catch (Exception ex) {
             Logger.getLogger(CategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -227,7 +227,7 @@ public class CategoriesPanel extends javax.swing.JPanel {
                 "Do you really want to delete category?")) {
             try {
                 repository.deleteCategory(selectedCategory.getId());
-                categoriesTableModel.setCategories(repository.selectCategories());
+                categoriesTableModel.setItems(repository.selectCategories());
                 clearForm();
             } catch (Exception ex) {
                 Logger.getLogger(CategoriesPanel.class.getName()).log(Level.SEVERE, null, ex);

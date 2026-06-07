@@ -54,4 +54,8 @@ public interface Repository {
     
     List<NasaImageExportDto> selectNasaImagesForExport() throws Exception;
     List<String> selectCategoryNamesForImage(int idImage) throws Exception;
+    
+    default boolean hasData() throws Exception {
+        return !selectNasaImages().isEmpty();
+    }
 }

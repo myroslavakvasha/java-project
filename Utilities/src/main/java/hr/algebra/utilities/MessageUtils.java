@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
  *
  * @author dnlbe
  */
-public class MessageUtils {
+public final class MessageUtils {
 
     private MessageUtils() {
     }

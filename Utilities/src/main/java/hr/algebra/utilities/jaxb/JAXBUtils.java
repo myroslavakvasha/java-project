@@ -14,7 +14,7 @@ import javax.xml.bind.Unmarshaller;
  *
  * @author kvash
  */
-public class JAXBUtils {
+public final class JAXBUtils {
 
     private JAXBUtils() {
     }

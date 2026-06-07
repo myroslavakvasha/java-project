@@ -10,7 +10,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
  *
  * @author kvash
  */
-public class PasswordUtils {
+public final class PasswordUtils {
 
     public PasswordUtils() {
     }
