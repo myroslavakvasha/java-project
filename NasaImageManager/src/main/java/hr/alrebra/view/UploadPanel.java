@@ -199,7 +199,7 @@ public class UploadPanel extends javax.swing.JPanel {
         } catch (Exception ex) {
             Logger.getLogger(UploadPanel.class.getName()).log(Level.SEVERE, null, ex);
             MessageUtils.showErrorMessage("Unrecoverable error", "Cannot initiate the form");
-            //System.exit(1); // app creshes no can do!
+            //System.exit(1); // app crashes no can do!
         }
     }
 

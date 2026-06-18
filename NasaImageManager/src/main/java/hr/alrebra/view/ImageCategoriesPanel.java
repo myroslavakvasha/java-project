@@ -196,7 +196,7 @@ public class ImageCategoriesPanel extends javax.swing.JPanel {
             lAvailible.setModel(availableModel);
             lAvailible.setDragEnabled(true);
             lAvailible.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            // select one or more contiguous ranges of indices at a time.
+            // select one or more contiguous ranges of indices at a time
 
             assignedModel = new DefaultListModel<>();
             lAssigned.setModel(assignedModel);

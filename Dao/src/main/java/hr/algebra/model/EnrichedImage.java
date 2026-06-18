@@ -12,8 +12,8 @@ import java.util.Set;
  */
 public final class EnrichedImage {
 
-    NasaImage image;
-    Set<Category> matchedCategories;
+    private NasaImage image;
+    private Set<Category> matchedCategories;
 
     public EnrichedImage() {
     }
